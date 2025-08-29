@@ -3,15 +3,41 @@ from typing import List
 
 class Solution:
     def equationsPossible(self, equations: List[str]) -> bool:
-        m = [[0 for _ in range(26)] for _ in range(26)]
+        m = {}
         for s in equations:
-            lv = ord(s[0]) - 97
-            rv = ord(s[3]) - 97
+            lv = s[0]
+            rv = s[3]
             if s[1] == "=":
-                m[lv][rv] = 1
-                m[rv][lv] = 1
-        for mm in m:
-            print(mm)
+                if lv in m:
+                    m[lv].append(rv)
+                else:
+                    m[lv] = [rv]
+                if rv in m:
+                    m[rv].append(lv)
+                else:
+                    m[rv] = [lv]
+
+        def lin(l, r, m, qc):
+            if l in qc:
+                return True
+            qc.append(l)
+            if l in m:
+                if r in m[l]:
+                    return False
+                for h in m[l]:
+                    if not lin(h, r, m, qc):
+                        return False
+            return True
+
+        for s in equations:
+            lv = s[0]
+            rv = s[3]
+            if s[1] == "!":
+                if lv == rv:
+                    return False
+                vv = lin(lv, rv, m, [])
+                if not vv:
+                    return False
         return True
 
 
@@ -38,5 +64,9 @@ if __name__ == "__main__":
 
     # case 5
     equations = ["a==b", "e==c", "b==c", "a!=e"]
+    r = Solution().equationsPossible(equations)
+    print(r)
+
+    equations = ["e!=c","b!=b","b!=a","e==d"]
     r = Solution().equationsPossible(equations)
     print(r)
