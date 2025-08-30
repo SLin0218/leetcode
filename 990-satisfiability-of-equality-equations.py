@@ -1,42 +1,77 @@
 from typing import List
 
+# dps 使用深度优先搜索图
+# class Solution:
+#     def equationsPossible(self, equations: List[str]) -> bool:
+#         m = {}
+#         for s in equations:
+#             left = s[0]
+#             right = s[3]
+#             if s[1] == "=":
+#                 if left in m:
+#                     m[left].append(right)
+#                 else:
+#                     m[left] = [right]
+#                 if right in m:
+#                     m[right].append(left)
+#                 else:
+#                     m[right] = [left]
+#             # 已经遍例过
+#             if left in qc:
+#                 return True
+#             qc.append(left)
+#             if left in d:
+#                 if right in d[left]:
+#                     return False
+#                 for h in m[left]:
+#                     if not dfs(h, right, d, qc):
+#                         return False
+#             return True
+#
+#         for s in equations:
+#             left = s[0]
+#             right = s[3]
+#             if s[1] == "!":
+#                 if left == right:
+#                     return False
+#                 if not dfs(left, right, m, []):
+#                     return False
+#         return True
+
+
+# Union Find 并查集数据结构
+class UnionFind:
+    def __init__(self) -> None:
+        self.uf = [i for i in range(26)]
+
+    # 递归查找到根节点返回 根节点的父节点等于自身
+    def find(self, x):
+        if self.uf[x] == x:
+            return x
+        else:
+            root = self.find(self.uf[x])
+            # 路径压缩, 沿途所有节点指向根节点
+            self.uf[x] = root
+            return root
+
+    # 找到a元素的根节点 指向新的根 b 合并两个集合
+    def union(self, a: int, b: int):
+        self.uf[self.find(a)] = self.find(b)
+
 
 class Solution:
+
     def equationsPossible(self, equations: List[str]) -> bool:
-        m = {}
+        def toInt(s: str):
+            return ord(s[0]) - 97
+
+        union_find = UnionFind()
         for s in equations:
-            lv = s[0]
-            rv = s[3]
             if s[1] == "=":
-                if lv in m:
-                    m[lv].append(rv)
-                else:
-                    m[lv] = [rv]
-                if rv in m:
-                    m[rv].append(lv)
-                else:
-                    m[rv] = [lv]
-
-        def lin(l, r, m, qc):
-            if l in qc:
-                return True
-            qc.append(l)
-            if l in m:
-                if r in m[l]:
-                    return False
-                for h in m[l]:
-                    if not lin(h, r, m, qc):
-                        return False
-            return True
-
+                union_find.union(toInt(s[0]), toInt(s[3]))
         for s in equations:
-            lv = s[0]
-            rv = s[3]
             if s[1] == "!":
-                if lv == rv:
-                    return False
-                vv = lin(lv, rv, m, [])
-                if not vv:
+                if union_find.find(toInt(s[0])) == union_find.find(toInt(s[3])):
                     return False
         return True
 
@@ -67,6 +102,6 @@ if __name__ == "__main__":
     r = Solution().equationsPossible(equations)
     print(r)
 
-    equations = ["e!=c","b!=b","b!=a","e==d"]
+    equations = ["e!=c", "b!=b", "b!=a", "e==d"]
     r = Solution().equationsPossible(equations)
     print(r)
