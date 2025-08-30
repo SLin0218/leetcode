@@ -46,13 +46,10 @@ class UnionFind:
 
     # 递归查找到根节点返回 根节点的父节点等于自身
     def find(self, x):
-        if self.uf[x] == x:
-            return x
-        else:
-            root = self.find(self.uf[x])
+        if self.uf[x] != x:
             # 路径压缩, 沿途所有节点指向根节点
-            self.uf[x] = root
-            return root
+            self.uf[x] = self.find(self.uf[x])
+        return self.uf[x]
 
     # 找到a元素的根节点 指向新的根 b 合并两个集合
     def union(self, a: int, b: int):
